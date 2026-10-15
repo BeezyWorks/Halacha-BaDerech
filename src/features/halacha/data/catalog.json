@@ -1,0 +1,488 @@
+{
+  "sefarim": [
+    {
+      "id": "oc",
+      "he": "אורח חיים",
+      "en": "Orach Chayim",
+      "group": "shulchanAruch",
+      "sefaria": "Shulchan Arukh, Orach Chayim",
+      "baseVersion": "Maginei Eretz: Shulchan Aruch Orach Chaim, Lemberg, 1893",
+      "simanim": 697,
+      "noseiKeilim": [
+        "magenAvraham",
+        "tureiZahav",
+        "baerHetev",
+        "shaareiTeshuvah",
+        "beerHaGolah",
+        "beurHaGra",
+        "rabbiAkivaEiger"
+      ]
+    },
+    {
+      "id": "yd",
+      "he": "יורה דעה",
+      "en": "Yoreh De'ah",
+      "group": "shulchanAruch",
+      "sefaria": "Shulchan Arukh, Yoreh De'ah",
+      "baseVersion": "Ashlei Ravrevei: Shulchan Aruch Yoreh Deah, Lemberg, 1888",
+      "simanim": 403,
+      "noseiKeilim": [
+        "sifteiKohen",
+        "tureiZahav",
+        "pitcheiTeshuva",
+        "baerHetev",
+        "beerHaGolah",
+        "beurHaGra",
+        "rabbiAkivaEiger"
+      ],
+      "coverage": [
+        [1, 168],
+        [170, 403]
+      ]
+    },
+    {
+      "id": "eh",
+      "he": "אבן העזר",
+      "en": "Even HaEzer",
+      "group": "shulchanAruch",
+      "sefaria": "Shulchan Arukh, Even HaEzer",
+      "baseVersion": "Apei Ravrevei: Shulchan Aruch Even HaEzer, Lemberg, 1886",
+      "simanim": 178,
+      "noseiKeilim": [
+        "beitShmuel",
+        "chelkatMechokek",
+        "tureiZahav",
+        "pitcheiTeshuva",
+        "baerHetev",
+        "beerHaGolah",
+        "beurHaGra",
+        "rabbiAkivaEiger"
+      ]
+    },
+    {
+      "id": "cm",
+      "he": "חושן משפט",
+      "en": "Choshen Mishpat",
+      "group": "shulchanAruch",
+      "sefaria": "Shulchan Arukh, Choshen Mishpat",
+      "baseVersion": "Shulhan Arukh, Hoshen ha-Mishpat, Lemberg, 1898",
+      "simanim": 427,
+      "noseiKeilim": [
+        "meiratEinayim",
+        "sifteiKohen",
+        "tureiZahav",
+        "ketzotHaChoshen",
+        "netivotBeurim",
+        "netivotHidushim",
+        "urim",
+        "tumim",
+        "pitcheiTeshuva",
+        "baerHetev",
+        "beerHaGolah",
+        "beurHaGra",
+        "rabbiAkivaEiger"
+      ]
+    },
+    {
+      "id": "mb",
+      "he": "משנה ברורה",
+      "en": "Mishna Berura",
+      "group": "mishnaBerura",
+      "sefaria": "Mishnah Berurah",
+      "baseVersion": "On Your Way",
+      "simanim": 697,
+      "noseiKeilim": ["biurHalacha"],
+      "coverage": [
+        [187, 587],
+        [589, 697]
+      ]
+    },
+    {
+      "id": "kitzur",
+      "he": "קיצור שולחן ערוך",
+      "en": "Kitzur Shulchan Aruch",
+      "group": "kitzur",
+      "sefaria": "Kitzur Shulchan Arukh",
+      "baseVersion": "Torat Emet 357",
+      "simanim": 221,
+      "noseiKeilim": []
+    }
+  ],
+  "works": [
+    {
+      "id": "magenAvraham",
+      "he": "מגן אברהם",
+      "en": "Magen Avraham",
+      "abbr": "מ\"א",
+      "dh": "bold",
+      "markerNames": ["Magen Avraham"],
+      "parts": {
+        "oc": {
+          "title": "Magen Avraham",
+          "unit": "sk",
+          "versions": ["Magen Avraham"]
+        }
+      }
+    },
+    {
+      "id": "tureiZahav",
+      "he": "טורי זהב",
+      "en": "Turei Zahav",
+      "abbr": "ט\"ז",
+      "dh": "bold",
+      "markerNames": ["Turei Zahav"],
+      "parts": {
+        "oc": {
+          "title": "Turei Zahav on Shulchan Arukh, Orach Chayim",
+          "unit": "sk",
+          "versions": ["Maginei Eretz: Shulchan Aruch Orach Chaim, Lemberg, 1893"]
+        },
+        "yd": {
+          "title": "Turei Zahav on Shulchan Arukh, Yoreh De'ah",
+          "unit": "sk",
+          "versions": ["Ashlei Ravrevei: Shulchan Aruch Yoreh Deah, Lemberg, 1888"]
+        },
+        "eh": {
+          "title": "Turei Zahav on Shulchan Arukh, Even HaEzer",
+          "unit": "sk",
+          "versions": ["Apei Ravrevei: Shulchan Aruch Even HaEzer, Lemberg, 1886"]
+        },
+        "cm": {
+          "title": "Turei Zahav on Shulchan Arukh, Choshen Mishpat",
+          "unit": "link",
+          "versions": ["Shulhan Arukh, Hoshen ha-Mishpat, Lemberg, 1898"]
+        }
+      }
+    },
+    {
+      "id": "baerHetev",
+      "he": "באר היטב",
+      "en": "Ba'er Hetev",
+      "abbr": "באה\"ט",
+      "dh": "bold",
+      "markerNames": ["Ba'er Hetev"],
+      "parts": {
+        "oc": {
+          "title": "Ba'er Hetev on Shulchan Arukh, Orach Chayim",
+          "unit": "sk",
+          "versions": ["Torat Emet 357"]
+        },
+        "yd": {
+          "title": "Ba'er Hetev on Shulchan Arukh, Yoreh De'ah",
+          "unit": "sk",
+          "versions": ["Torat Emet 357"]
+        },
+        "eh": {
+          "title": "Ba'er Hetev on Shulchan Arukh, Even HaEzer",
+          "unit": "sk",
+          "versions": ["Torat Emet 357"]
+        },
+        "cm": {
+          "title": "Ba'er Hetev on Shulchan Arukh, Choshen Mishpat",
+          "unit": "sk",
+          "versions": ["Torat Emet 357"]
+        }
+      }
+    },
+    {
+      "id": "shaareiTeshuvah",
+      "he": "שערי תשובה",
+      "en": "Sha'arei Teshuvah",
+      "abbr": "שע\"ת",
+      "dh": "bold",
+      "markerNames": ["Sha'arei Teshuvah"],
+      "parts": {
+        "oc": {
+          "title": "Sha'arei Teshuvah on Shulchan Arukh, Orach Chayim",
+          "unit": "sk",
+          "versions": ["Maginei Eretz: Shulchan Aruch Orach Chaim, Lemberg, 1893"]
+        }
+      }
+    },
+    {
+      "id": "beerHaGolah",
+      "he": "באר הגולה",
+      "en": "Be'er HaGolah",
+      "abbr": "באה\"ג",
+      "dh": "bold",
+      "markerNames": ["Be'er HaGolah"],
+      "parts": {
+        "oc": {
+          "title": "Be'er HaGolah on Shulchan Arukh, Orach Chayim",
+          "unit": "sk",
+          "versions": ["Maginei Eretz: Shulchan Aruch Orach Chaim, Lemberg, 1893"]
+        },
+        "yd": {
+          "title": "Be'er HaGolah on Shulchan Arukh, Yoreh De'ah",
+          "unit": "sk",
+          "versions": ["Ashlei Ravrevei: Shulchan Aruch Yoreh Deah, Lemberg, 1888"]
+        },
+        "eh": {
+          "title": "Be'er HaGolah on Shulchan Arukh, Even HaEzer",
+          "unit": "sk",
+          "versions": ["Apei Ravrevei: Shulchan Aruch Even HaEzer, Lemberg, 1886"]
+        },
+        "cm": {
+          "title": "Be'er HaGolah on Shulchan Arukh, Choshen Mishpat",
+          "unit": "sk",
+          "versions": ["Shulhan Arukh, Hoshen ha-Mishpat; Lemberg, 1898"]
+        }
+      }
+    },
+    {
+      "id": "beurHaGra",
+      "he": "ביאור הגר\"א",
+      "en": "Beur HaGra",
+      "abbr": "גר\"א",
+      "dh": "bold",
+      "markerNames": ["Beur HaGra"],
+      "parts": {
+        "oc": {
+          "title": "Beur HaGra on Shulchan Arukh, Orach Chayim",
+          "unit": "seif",
+          "versions": ["Maginei Eretz: Shulchan Aruch Orach Chaim, Lemberg, 1893"]
+        },
+        "yd": {
+          "title": "Beur HaGra on Shulchan Arukh, Yoreh De'ah",
+          "unit": "sk",
+          "versions": ["Ashlei Ravrevei: Shulchan Aruch Yoreh Deah, Lemberg, 1888"]
+        },
+        "eh": {
+          "title": "Beur HaGra on Shulchan Arukh, Even HaEzer",
+          "unit": "sk",
+          "versions": ["Apei Ravrevei: Shulchan Aruch Even HaEzer, Lemberg, 1886"]
+        },
+        "cm": {
+          "title": "Beur HaGra on Shulchan Arukh, Choshen Mishpat",
+          "unit": "sk",
+          "versions": ["Shulhan Arukh, Hoshen ha-Mishpat; Lemberg, 1898"]
+        }
+      }
+    },
+    {
+      "id": "rabbiAkivaEiger",
+      "he": "הגהות רבי עקיבא איגר",
+      "en": "Rabbi Akiva Eiger",
+      "abbr": "רע\"א",
+      "dh": "boldLocator",
+      "markerNames": [],
+      "parts": {
+        "oc": {
+          "title": "Rabbi Akiva Eiger on Shulchan Arukh, Orach Chayim",
+          "unit": "link",
+          "versions": ["Maginei Eretz: Shulchan Aruch Orach Chaim, Lemberg, 1893"]
+        },
+        "yd": {
+          "title": "Rabbi Akiva Eiger on Shulchan Arukh, Yoreh De'ah",
+          "unit": "link",
+          "versions": ["Ashlei Ravrevei: Shulchan Aruch Yoreh Deah, Lemberg, 1888"]
+        },
+        "eh": {
+          "title": "Rabbi Akiva Eiger on Shulchan Arukh, Even HaEzer",
+          "unit": "link",
+          "versions": ["Apei Ravrevei: Shulchan Aruch Even HaEzer, Lemberg, 1886"]
+        },
+        "cm": {
+          "title": "Rabbi Akiva Eiger on Shulchan Arukh, Choshen Mishpat",
+          "unit": "link",
+          "versions": ["Shulhan Arukh, Hoshen ha-Mishpat, Lemberg, 1898"]
+        }
+      }
+    },
+    {
+      "id": "sifteiKohen",
+      "he": "שפתי כהן",
+      "en": "Siftei Kohen (Shach)",
+      "abbr": "ש\"ך",
+      "dh": "bold",
+      "markerNames": ["Siftei Kohen"],
+      "parts": {
+        "yd": {
+          "title": "Siftei Kohen on Shulchan Arukh, Yoreh De'ah",
+          "unit": "sk",
+          "versions": ["Ashlei Ravrevei: Shulchan Aruch Yoreh Deah, Lemberg, 1888"]
+        },
+        "cm": {
+          "title": "Siftei Kohen on Shulchan Arukh, Choshen Mishpat",
+          "unit": "sk",
+          "versions": ["Shulhan Arukh, Hoshen ha-Mishpat; Lemberg, 1898"]
+        }
+      }
+    },
+    {
+      "id": "pitcheiTeshuva",
+      "he": "פתחי תשובה",
+      "en": "Pitchei Teshuva",
+      "abbr": "פת\"ש",
+      "dh": "bold",
+      "markerNames": ["Pithei Teshuva", "Pitchei Teshuva"],
+      "parts": {
+        "yd": {
+          "title": "Pitchei Teshuva on Shulchan Arukh, Yoreh De'ah",
+          "unit": "sk",
+          "versions": ["Ashlei Ravrevei: Shulchan Aruch Yoreh Deah, Lemberg, 1888"]
+        },
+        "eh": {
+          "title": "Pitchei Teshuva on Shulchan Arukh, Even HaEzer",
+          "unit": "sk",
+          "versions": ["Apei Ravrevei: Shulchan Aruch Even HaEzer, Lemberg, 1886"]
+        },
+        "cm": {
+          "title": "Pitchei Teshuva on Shulchan Arukh, Choshen Mishpat",
+          "unit": "sk",
+          "versions": ["Shulhan Arukh, Hoshen ha-Mishpat; Lemberg, 1898"]
+        }
+      }
+    },
+    {
+      "id": "beitShmuel",
+      "he": "בית שמואל",
+      "en": "Beit Shmuel",
+      "abbr": "ב\"ש",
+      "dh": "bold",
+      "markerNames": ["Beit Shmuel"],
+      "parts": {
+        "eh": {
+          "title": "Beit Shmuel",
+          "unit": "sk",
+          "versions": ["Vilna, 1876"]
+        }
+      }
+    },
+    {
+      "id": "chelkatMechokek",
+      "he": "חלקת מחוקק",
+      "en": "Chelkat Mechokek",
+      "abbr": "ח\"מ",
+      "dh": "bold",
+      "markerNames": ["Chelkat Mechokek"],
+      "parts": {
+        "eh": {
+          "title": "Chelkat Mechokek",
+          "unit": "sk",
+          "versions": ["Vilna, 1876"]
+        }
+      }
+    },
+    {
+      "id": "meiratEinayim",
+      "he": "מאירת עיניים",
+      "en": "Me'irat Einayim (Sma)",
+      "abbr": "סמ\"ע",
+      "dh": "boldOrPeriod",
+      "markerNames": ["Me'irat Einayim"],
+      "parts": {
+        "cm": {
+          "title": "Me'irat Einayim on Shulchan Arukh, Choshen Mishpat",
+          "unit": "sk",
+          "versions": ["Shulhan Arukh, Hoshen ha-Mishpat; Lemberg, 1898"]
+        }
+      }
+    },
+    {
+      "id": "ketzotHaChoshen",
+      "he": "קצות החושן",
+      "en": "Ketzot HaChoshen",
+      "abbr": "קצוה\"ח",
+      "dh": "boldOrPeriod",
+      "markerNames": ["Ketzot HaChoshen"],
+      "parts": {
+        "cm": {
+          "title": "Ketzot HaChoshen on Shulchan Arukh, Choshen Mishpat",
+          "unit": "sk",
+          "versions": ["Shulhan Arukh, Hoshen ha-Mishpat; Lemberg, 1898"]
+        }
+      }
+    },
+    {
+      "id": "netivotBeurim",
+      "he": "נתיבות המשפט, ביאורים",
+      "en": "Netivot HaMishpat, Beurim",
+      "abbr": "נתיה\"מ ב'",
+      "dh": "boldOrPeriod",
+      "markerNames": ["Netivot HaMishpat, Beurim"],
+      "parts": {
+        "cm": {
+          "title": "Netivot HaMishpat, Beurim on Shulchan Arukh, Choshen Mishpat",
+          "unit": "sk",
+          "versions": ["Shulhan Arukh, Hoshen ha-Mishpat, Lemberg, 1898"]
+        }
+      }
+    },
+    {
+      "id": "netivotHidushim",
+      "he": "נתיבות המשפט, חידושים",
+      "en": "Netivot HaMishpat, Hidushim",
+      "abbr": "נתיה\"מ ח'",
+      "dh": "boldOrPeriod",
+      "markerNames": ["Netivot HaMishpat, Hidushim"],
+      "parts": {
+        "cm": {
+          "title": "Netivot HaMishpat, Hidushim on Shulchan Arukh, Choshen Mishpat",
+          "unit": "sk",
+          "versions": ["Shulhan Arukh, Hoshen ha-Mishpat, Lemberg, 1898"]
+        }
+      }
+    },
+    {
+      "id": "urim",
+      "he": "אורים",
+      "en": "Urim",
+      "abbr": "אורים",
+      "dh": "bold",
+      "markerNames": ["Urim VeTumim, Urim"],
+      "parts": {
+        "cm": {
+          "title": "Urim VeTumim, Urim",
+          "unit": "sk",
+          "versions": ["Urim veTumim, Warsaw 1881"]
+        }
+      }
+    },
+    {
+      "id": "tumim",
+      "he": "תומים",
+      "en": "Tumim",
+      "abbr": "תומים",
+      "dh": "bold",
+      "markerNames": ["Urim VeTumim, Tumim"],
+      "parts": {
+        "cm": {
+          "title": "Urim VeTumim, Tumim",
+          "unit": "sk",
+          "versions": ["Urim veTumim, Warsaw 1881, Vol 1", "Urim veTumim, Warsaw 1881, Vol 2"]
+        }
+      }
+    },
+    {
+      "id": "biurHalacha",
+      "he": "ביאור הלכה",
+      "en": "Biur Halacha",
+      "abbr": "ביה\"ל",
+      "dh": "bold",
+      "markerNames": [],
+      "parts": {
+        "mb": {
+          "title": "Biur Halacha",
+          "unit": "seif",
+          "versions": ["Biur Halacha"]
+        }
+      }
+    }
+  ],
+  "ignoredMarkers": [
+    "Peleti",
+    "Kereti",
+    "Ateret Zekenim",
+    "Eshel Avraham",
+    "Chiddushei Hilkhot Niddah",
+    "Torat HaShlamim",
+    "Chok Yaakov",
+    "Nekudot HaKesef"
+  ],
+  "notes": {
+    "shaarHaTziyun": "Not on Sefaria; skipped.",
+    "mishnaBeruraCoverage": "Only On Your Way (Public Domain) is used; it covers simanim 187-587 and 589-697.",
+    "yd169": "Yoreh Deah 169 has no text on Sefaria (shape length 0); skipped."
+  }
+}

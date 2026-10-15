@@ -5,12 +5,8 @@ import React, { useEffect, useState } from 'react'
 import { Linking } from 'react-native'
 
 import { PageLayout } from '@/components/PageLayout'
-
-interface VersionInfo {
-  versionTitle: string
-  license: string
-}
-type Sources = Record<string, Record<string, { title: string; he?: VersionInfo; en?: VersionInfo }>>
+import { catalog, worksById } from '@/features/halacha/data/catalog'
+import type { Sources } from '@/features/halacha/data/catalog'
 
 const SUPPORT_EMAIL = 'mattaniah@beezyworks.com'
 const BASE = process.env.EXPO_PUBLIC_CONTENT_BASE_URL ?? ''
@@ -28,20 +24,26 @@ export function AboutScreen() {
       .catch(() => setSources({}))
   }, [])
 
-  // Collapse per-book entries into one line per distinct version.
-  // Works are added here as the ingest (step 2) defines them.
-  const works: { id: string; name: string }[] = [
-    { id: 'shulchan-aruch', name: 'Shulchan Aruch' },
-    { id: 'mishna-berura', name: 'Mishna Berura' },
-    { id: 'kitzur', name: 'Kitzur Shulchan Aruch' },
+  // One card per group of sefarim; one line per distinct (work, version) in it.
+  const groups: { id: string; name: string; seferIds: string[] }[] = [
+    { id: 'shulchanAruch', name: 'Shulchan Aruch and nosei keilim', seferIds: [] },
+    { id: 'mishnaBerura', name: 'Mishna Berura and Biur Halacha', seferIds: [] },
+    { id: 'kitzur', name: 'Kitzur Shulchan Aruch', seferIds: [] },
   ]
-  const versionsFor = (id: string) => {
-    const seen = new Map<string, VersionInfo & { lang: string }>()
-    Object.values(sources ?? {}).forEach((book) => {
-      const w = book[id]
-      ;(['he', 'en'] as const).forEach((lang) => {
-        const v = w?.[lang]
-        if (v) seen.set(`${lang}|${v.versionTitle}`, { ...v, lang })
+  catalog.sefarim.forEach((s) => groups.find((g) => g.id === s.group)?.seferIds.push(s.id))
+  const entriesFor = (seferIds: string[]) => {
+    const seen = new Map<string, { name: string; versionTitle: string; license: string }>()
+    seferIds.forEach((seferId) => {
+      const sefer = catalog.sefarim.find((s) => s.id === seferId)
+      Object.entries(sources?.[seferId] ?? {}).forEach(([workId, w]) => {
+        const name = workId === 'text' ? (sefer?.en ?? seferId) : (worksById[workId]?.en ?? workId)
+        w.versions.forEach((v) =>
+          seen.set(`${name}|${v.versionTitle}`, {
+            name,
+            versionTitle: v.versionTitle,
+            license: v.license,
+          }),
+        )
       })
     })
     return [...seen.values()]
@@ -73,16 +75,16 @@ export function AboutScreen() {
           }
         />
       </SettingsCard>
-      {works.map((w) => {
-        const versions = versionsFor(w.id)
-        if (!versions.length) return null
+      {groups.map((g) => {
+        const entries = entriesFor(g.seferIds)
+        if (!entries.length) return null
         return (
-          <SettingsCard key={w.id} title={w.name}>
-            {versions.map((v) => (
-              <Stack key={`${v.lang}|${v.versionTitle}`} gap="xs">
-                <Text variant="body">{v.versionTitle}</Text>
+          <SettingsCard key={g.id} title={g.name}>
+            {entries.map((e) => (
+              <Stack key={`${e.name}|${e.versionTitle}`} gap="xs">
+                <Text variant="body">{e.name}</Text>
                 <Text variant="detail" color={SemanticColor.TextSecondary}>
-                  {`${v.lang === 'he' ? 'Hebrew' : 'English'} · ${v.license}`}
+                  {`${e.versionTitle} · ${e.license}`}
                 </Text>
               </Stack>
             ))}

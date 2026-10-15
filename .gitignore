@@ -44,3 +44,4 @@ example
 
 # local eas builds (scripts/build-local.sh)
 /.build-local/
+scripts/.stats

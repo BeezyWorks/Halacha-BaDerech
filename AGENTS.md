@@ -38,9 +38,21 @@ same conventions.
 - **Mishna Berura** (`mb`): its own sefer, on Orach Chaim, with Biur Halacha.
 - **Kitzur Shulchan Aruch** (`kitzur`).
 - Planned: **Tur** and **Aruch HaShulchan**.
-- Content comes from Sefaria (version + license per work, shown on the
-  About screen). The ingest (`pnpm ingest`, `scripts/ingest-sefaria.mjs`)
-  is a stub until step 2; the app will fetch `public/content/...` at runtime.
+- Content comes from Sefaria (version + license per work, shown on the About
+  screen from `public/content/sources.json`). `pnpm ingest`
+  (`scripts/ingest-sefaria.mjs`, Node >= 23.6) writes one bundle per siman,
+  `public/content/<sefer>/<siman>.json` (type `SimanBundle` in
+  `features/halacha/content/types.ts`), plus `<sefer>/index.json` (siman
+  list) and `sources.json`. The catalog `features/halacha/data/catalog.json`
+  (typed wrapper `catalog.ts`) is read by both the ingest and the app:
+  sefarim, base versions, and works (stable camelCase ids like
+  `magenAvraham`, abbreviation, Sefaria title/version per chelek, how each is
+  indexed). Parsing/anchoring is pure TS in `features/halacha/content/`
+  (Jest-tested): inline `<i data-commentator>` markers give each comment's
+  seif and an anchor offset, matched to its dibur hamaschil for `end`.
+- Mishna Berura: only the Public Domain "On Your Way" version is used, and
+  Sefaria has it for simanim 187-587 and 589-697 only (catalog `coverage`).
+  Sha'ar HaTziyun is not on Sefaria.
 - Navigation is **sefer → siman → seif**. Tapping a seif opens its nosei
   keilim in the root `SheetRoot` (DL `BottomSheetModal`: bottom sheet on
   phones, right panel on wide web), with notes and bookmark.
@@ -64,7 +76,7 @@ git submodule update --init
 pnpm install
 pnpm web             # dev server
 pnpm typecheck && pnpm test
-pnpm ingest          # refresh content from Sefaria (stub until step 2)
+pnpm ingest          # refresh content from Sefaria (resumable; usage in the file header)
 pnpm deploy:web      # expo export + wrangler deploy (Cloudflare)
 ```
 
