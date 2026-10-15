@@ -1,0 +1,62 @@
+name: Mobile Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Tag to build (defaults to the latest GitHub release)
+        required: false
+        default: latest
+      profile:
+        description: EAS build profile
+        required: false
+        default: production
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve ref
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ inputs.ref }}" = "latest" ] || [ -z "${{ inputs.ref }}" ]; then
+            TAG=$(gh release view --repo "${{ github.repository }}" --json tagName -q .tagName)
+          else
+            TAG="${{ inputs.ref }}"
+          fi
+          echo "Building ref: $TAG"
+          echo "ref=$TAG" >> "$GITHUB_OUTPUT"
+
+      # packages/design is a submodule (the public BeezyWorks/design-system).
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve.outputs.ref }}
+          submodules: true
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Only production builds are store-bound; --auto-submit uses the
+      # `submit` profile matching the build profile, and internal-distribution
+      # profiles (preview/development) have none.
+      - name: EAS Build
+        run: |
+          SUBMIT_FLAG=""
+          if [ "${{ inputs.profile }}" = "production" ]; then
+            SUBMIT_FLAG="--auto-submit"
+          fi
+          npx eas-cli build --platform all --profile ${{ inputs.profile }} --non-interactive $SUBMIT_FLAG
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
