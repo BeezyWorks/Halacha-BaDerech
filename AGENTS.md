@@ -52,22 +52,42 @@ same conventions.
   (Jest-tested): inline `<i data-commentator>` markers give each comment's
   seif and an anchor offset, matched to its dibur hamaschil for `end`.
 - **Versions per sefer.** A catalog sefer may list `versions`: each
-  `{ version, ranges?, licenseOverride?, note? }`. A siman is read from the
+  `{ version, ranges?, licenseOverride?, note? }` (or, for Hebrew Wikisource,
+  `{ source: 'wikisource', page: 'משנה ברורה על אורח חיים {siman}', ranges,
+  license, url, note }`; see below). A siman is read from the
   first version whose `ranges` contain it (no `ranges` = fallback for
   everything); an empty version falls through to the next. `licenseOverride`
   (+ `note`) lets one named version pass the ingest's license check when
   Sefaria's metadata is wrong or "unknown"; the global accepted list is never
   loosened. `sources.json` records each version with its `ranges` and `note`,
-  and the About screen shows them. Mishna Berura: "On Your Way" (Public
-  Domain) for simanim 187-587 and 589-697; Hebrew Wikisource's "Wikitext"
-  (recorded as CC-BY-SA) for the only early simanim it has: 1-2, 8, 25, 58, 89.
-- **Mishna Berura coverage.** Biur Halacha is fetched for every siman, so
-  MB `coverage` (catalog) is every siman with MB text *or* Biur Halacha (659
-  of 697). A siman with only Biur Halacha has empty `seifim` and renders the
-  Orach Chaim seifim (tap one for its Biur Halacha) under a notice; the other
-  38 are dimmed in the list. MB anchors for the Wikitext simanim: 211 of 211
-  markers mapped, 207 with `end` (DH located); the format is the same
-  `(א) DH – body` that `splitMb` handles. Sha'ar HaTziyun is not on Sefaria.
+  and the About screen shows them (with a link for Wikisource). Mishna Berura:
+  "On Your Way" (Public Domain, Sefaria) for simanim 187-587 and 589-697;
+  **Hebrew Wikisource** (CC-BY-SA) for 1-186 and 588, where Sefaria has no
+  usable text.
+- **Wikisource MB source.** `scripts/lib/wikisource.mjs` fetches wikitext
+  politely (descriptive User-Agent, serial requests, `maxlag=5`, batched titles,
+  backoff on 429/non-JSON, raw cache in git-ignored `scripts/.cache/wikisource/`).
+  `content/wikisource.ts` (pure, Jest-tested) parses a page into MB `Unit`s
+  (`n` = sk, `saSeif` from the `===סעיף X===` header or `<קטע התחלה=X/>`,
+  `dh` from `{{משע|מב|<sk>|<DH>}}` plus any bold continuation). Templates:
+  `משע` (structure), `ררר`/`ממ …`/`להשלים`/`תוכן עניינים שטוח`/header (dropped),
+  `צ`/`קטן`/`ב`/`מקור` (their text); unknown ones are dropped and logged.
+  Older pages use `'''(א) DH''' — body`; text before a seif's first sk becomes
+  an unnumbered unit (`n: 0`, no label); `==משנת סופרים==` after siman 36's seifim
+  and stub text like "אין" are dropped. `buildMbBundle({ mbUnits })` anchors by
+  the OC text's own MB markers (the marker's seif wins over a misfiled Wikisource
+  header) and records alignment in the stats (`mbSkNoMarker`, `mbMarkerNoSk`,
+  `mbSeifDisagree`; `--stats` prints them). Alignment on 1-186 + 588: 4426 of
+  4428 OC markers have a seif katan (missing in the source: 8 sk לב, 153 sk ק),
+  none the other way; 178 of 187 simanim align perfectly; Wikisource's seif
+  headers disagree with the OC text for 25 sk in 8 simanim (58, 63, 92, 125,
+  154, 160, 174); `end` found for 95.1%. Wikisource page order is irregular in
+  8, 125 and 153 (sk skipped/out of order; the bundle sorts by sk).
+- **Mishna Berura coverage.** Every siman has MB text, and Biur Halacha is
+  fetched for every siman, so the catalog has no MB `coverage` (the list shows
+  no gap note). A siman with only Biur Halacha (none now) would have empty
+  `seifim` and render the Orach Chaim seifim under a notice.
+  Sha'ar HaTziyun is on neither Sefaria nor Wikisource in usable form.
 - Navigation is **sefer → siman → seif**. Tapping a seif opens its nosei
   keilim in the root `SheetRoot` (DL `BottomSheetModal`: bottom sheet on
   phones, right panel on wide web), with notes and bookmark.
@@ -116,9 +136,13 @@ scrolling).
 
 ## Known gaps
 
-- Sha'ar HaTziyun is not on Sefaria; Yoreh Deah 169 has no text (skipped).
+- Sha'ar HaTziyun is not on Sefaria; Hebrew Wikisource has an index of ~700
+  links but only 7 pages (simanim 1-4, 123, 202, 233), mostly source-abbreviation
+  lists or short excerpts, so it was not ingested. Yoreh Deah 169 has no text (skipped).
 - Tur and Aruch HaShulchan are planned; super-commentaries were skipped.
-- 38 Mishna Berura simanim have neither MB nor Biur Halacha text.
+- Mishna Berura simanim 1-186 and 588 come from Wikisource and so are only as good as it
+  is: sk 32 of siman 8 and sk 100 of siman 153 are missing there, and siman 36's
+  Mishnat Sofrim appendix is not included.
 - The home photo is a placeholder.
 - No EAS project is linked yet, and `eas.json` has no content base URL
   (`EXPO_PUBLIC_CONTENT_BASE_URL`) yet; native builds need one.
@@ -133,7 +157,7 @@ pnpm install
 pnpm web             # dev server
 pnpm typecheck && pnpm test
 pnpm ingest          # refresh content from Sefaria (resumable; usage in the file header)
-node scripts/ingest-sefaria.mjs --sefer mb --simanim 1-186,588   # a subset; --force, --stats
+node scripts/ingest-sefaria.mjs --sefer mb --simanim 1-186,588   # a subset; --force, --stats (MB alignment report)
 pnpm deploy:web      # expo export + wrangler deploy (Cloudflare)
 ```
 

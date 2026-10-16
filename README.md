@@ -44,7 +44,9 @@ node scripts/ingest-sefaria.mjs --force | --sources-only | --stats
 
 A sefer's catalog entry may list several `versions` with siman `ranges`; a
 version Sefaria mislabels can carry a `licenseOverride` and a `note` (Mishna
-Berura uses Hebrew Wikisource's text, CC-BY-SA, for a few early simanim).
+Berura uses Hebrew Wikisource's text, CC-BY-SA, for simanim 1-186 and 588 via a
+`source: 'wikisource'` version; it is fetched politely and cached in
+`scripts/.cache/wikisource/`, git-ignored).
 Every version and its license is shown in-app under Settings, About.
 
 The reader engine (`src/features/reader`) is generic and intended for reuse
