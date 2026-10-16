@@ -2,6 +2,7 @@ import { useBookmarksStore } from '../bookmarks/store/bookmarksStore'
 import type { Bookmark } from '../bookmarks/types'
 import { useNotesStore } from '../notes/store/notesStore'
 import type { Note } from '../notes/types'
+import { useCommentaryStore } from './store/commentaryStore'
 import { usePreferencesStore } from './store/preferencesStore'
 
 /** Bump when the backup shape changes incompatibly. */
@@ -13,8 +14,15 @@ export interface Backup {
   version: number
   exportedAt: string
   preferences: Record<string, unknown>
+  /** Nosei keilim chosen per sefer, and the Rema display. Absent in backups from before they existed. */
+  commentary: CommentaryBackup
   bookmarks: Bookmark[]
   notes: Note[]
+}
+
+export interface CommentaryBackup {
+  enabledWorks?: Record<string, string[]>
+  remaInRashi?: boolean
 }
 
 type Plain = Record<string, unknown>
@@ -37,6 +45,22 @@ const isNote = (v: unknown): v is Note =>
   typeof v.createdAt === 'number' &&
   typeof v.updatedAt === 'number' &&
   isLocation(v.location)
+
+/** Keeps only the well-typed parts of a commentary backup: a list of work ids per sefer, and the Rema flag. */
+function parseCommentary(raw: unknown): CommentaryBackup {
+  if (!isPlain(raw)) return {}
+  const out: CommentaryBackup = {}
+  if (isPlain(raw.enabledWorks)) {
+    const works: Record<string, string[]> = {}
+    for (const [sefer, list] of Object.entries(raw.enabledWorks)) {
+      if (Array.isArray(list))
+        works[sefer] = [...new Set(list.filter((w) => typeof w === 'string'))]
+    }
+    out.enabledWorks = works
+  }
+  if (typeof raw.remaInRashi === 'boolean') out.remaInRashi = raw.remaInRashi
+  return out
+}
 
 /** The plain-data part of a store's state (drops the action functions). */
 function dataOf(state: object): Plain {
@@ -70,6 +94,7 @@ export function buildBackup(): Backup {
     version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
     preferences: dataOf(usePreferencesStore.getState()),
+    commentary: dataOf(useCommentaryStore.getState()),
     bookmarks: useBookmarksStore.getState().bookmarks,
     notes: useNotesStore.getState().notes,
   }
@@ -100,15 +125,23 @@ export function parseBackup(text: string): ParsedBackup {
       version: raw.version,
       exportedAt: typeof raw.exportedAt === 'string' ? raw.exportedAt : '',
       preferences: pickKnown(dataOf(usePreferencesStore.getState()), raw.preferences),
+      commentary: parseCommentary(raw.commentary),
       bookmarks: Array.isArray(raw.bookmarks) ? raw.bookmarks.filter(isBookmark) : [],
       notes: Array.isArray(raw.notes) ? raw.notes.filter(isNote) : [],
     },
   }
 }
 
-/** Replaces the current notes, bookmarks and preferences with the backup's. */
+/** Replaces the current notes, bookmarks, nosei keilim choices and preferences with the backup's. */
 export function applyBackup(backup: Backup) {
   usePreferencesStore.setState(backup.preferences)
+  // A backup without commentary settings (older file) leaves the current ones alone.
+  useCommentaryStore.setState({
+    ...(backup.commentary.enabledWorks ? { enabledWorks: backup.commentary.enabledWorks } : {}),
+    ...(backup.commentary.remaInRashi !== undefined
+      ? { remaInRashi: backup.commentary.remaInRashi }
+      : {}),
+  })
   useBookmarksStore.setState({ bookmarks: backup.bookmarks })
   useNotesStore.setState({ notes: backup.notes })
 }

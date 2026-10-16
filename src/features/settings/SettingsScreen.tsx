@@ -19,6 +19,9 @@ import React from 'react'
 import { PageLayout } from '@/components/PageLayout'
 import { SliderRow } from '@/components/SliderRow'
 import { DataSettings } from './components/DataSettings'
+import { NoseiKeilimSettings } from './components/NoseiKeilimSettings'
+import { useCommentaryStore } from './store/commentaryStore'
+import { seferById } from '../halacha/data/catalog'
 import {
   type ColorSchemePreference,
   FONT_SIZE_MAX,
@@ -70,9 +73,17 @@ function TextPreview() {
   )
 }
 
+/** Nosei keilim are chosen per sefer: each chelek of the Shulchan Aruch and the Mishna Berura (Biur Halacha). */
+const NOSEI_KEILIM_SECTIONS = ['oc', 'yd', 'eh', 'cm', 'mb'].map((sefer) => ({
+  sefer,
+  title: `${sefer === 'mb' ? 'Biur Halacha' : 'Nosei keilim'} — ${seferById(sefer)?.en ?? sefer}`,
+}))
+
 export function SettingsScreen() {
   const router = useRouter()
   const p = usePreferencesStore()
+  const remaInRashi = useCommentaryStore((s) => s.remaInRashi)
+  const setRemaInRashi = useCommentaryStore((s) => s.setRemaInRashi)
 
   return (
     <PageLayout title="הגדרות" display>
@@ -114,12 +125,14 @@ export function SettingsScreen() {
         />
       </SettingsCard>
 
-      <SettingsCard title="English">
-        <ToggleSetting
-          title="English translation"
-          enabled={p.showTranslation}
-          onSwitch={p.setShowTranslation}
-        />
+      {NOSEI_KEILIM_SECTIONS.map(({ sefer, title }) => (
+        <SettingsCard key={sefer} title={title}>
+          <NoseiKeilimSettings sefer={sefer} />
+        </SettingsCard>
+      ))}
+
+      <SettingsCard title="Commentary display">
+        <ToggleSetting title="Rema in ktav Rashi" enabled={remaInRashi} onSwitch={setRemaInRashi} />
       </SettingsCard>
 
       <SettingsCard title="Data">

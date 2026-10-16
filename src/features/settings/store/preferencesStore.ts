@@ -30,8 +30,6 @@ interface PreferencesState {
   /** Reading typeface/size/leading, in the design system's vocabulary. Size and
    * leading are always the DL's numeric form (slider + stepper buttons), never presets. */
   content: ContentSelection & { size: number; leading: number }
-  /** English translation alongside the Hebrew. */
-  showTranslation: boolean
   /** Share of the seif panel the pinned seif may take before it scrolls. */
   seifPaneRatio: number
   /** Icon-only nav rail on wide web. */
@@ -41,7 +39,6 @@ interface PreferencesState {
   setTypeface: (value: Typeface) => void
   setContentSize: (value: number) => void
   setLeading: (value: number) => void
-  setShowTranslation: (value: boolean) => void
   setSeifPaneRatio: (ratio: number) => void
   toggleNavRailCollapsed: () => void
 }
@@ -55,7 +52,6 @@ export const usePreferencesStore = create<PreferencesState>()(
         size: DEFAULT_FONT_SIZE,
         leading: DEFAULT_LEADING,
       },
-      showTranslation: false,
       seifPaneRatio: 0.35,
       navRailCollapsed: false,
 
@@ -72,7 +68,6 @@ export const usePreferencesStore = create<PreferencesState>()(
             leading: clamp(Math.round(leading * 10) / 10, LEADING_MIN, LEADING_MAX),
           },
         })),
-      setShowTranslation: (showTranslation) => set({ showTranslation }),
       setSeifPaneRatio: (seifPaneRatio) => set({ seifPaneRatio }),
       toggleNavRailCollapsed: () => set((s) => ({ navRailCollapsed: !s.navRailCollapsed })),
     }),
