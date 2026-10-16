@@ -27,13 +27,26 @@ export interface CatalogWork {
   parts: Record<string, CatalogPart>
 }
 
+/** One Sefaria version of a sefer's base text, optionally for only some simanim. */
+export interface CatalogVersion {
+  version: string
+  /** Inclusive [first, last] simanim this version supplies; absent = all (a fallback). */
+  ranges?: [number, number][]
+  /** The license to record when Sefaria's metadata for this version is wrong/"unknown". */
+  licenseOverride?: string
+  note?: string
+}
+
 export interface CatalogSefer {
   id: string
   he: string
   en: string
   group: 'shulchanAruch' | 'mishnaBerura' | 'kitzur'
   sefaria: string
+  /** The primary version. */
   baseVersion: string
+  /** Per-siman-range versions (primary + overrides); see scripts/ingest-sefaria.mjs. */
+  versions?: CatalogVersion[]
   /** Number of simanim in the sefer (some may be missing: see `coverage`). */
   simanim: number
   /** Inclusive [first, last] ranges of simanim that have content, when not all of them. */
@@ -67,5 +80,8 @@ export interface SourceVersion {
   versionTitle: string
   license: string
   versionSource?: string
+  /** Simanim this version supplies, when a sefer mixes versions. */
+  ranges?: [number, number][]
+  note?: string
 }
 export type Sources = Record<string, Record<string, { title: string; versions: SourceVersion[] }>>

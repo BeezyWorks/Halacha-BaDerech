@@ -1,4 +1,4 @@
-import { SemanticColor, Stack, formatGematriya } from '@beezyworks/design'
+import { SemanticColor, Stack, Text, formatGematriya } from '@beezyworks/design'
 import React, { useMemo } from 'react'
 
 import { UnitText } from '../../reader/components/UnitText'
@@ -44,7 +44,7 @@ const MbSeifBlock = React.memo(function MbSeifBlock({
       onLayout={(e) => register(key, e.nativeEvent.layout.y)}
     >
       <UnitText
-        muted
+        muted={seifimKatanim.length > 0}
         runs={runs}
         label={`${marked ? '• ' : ''}${formatGematriya(base.n)}`}
         hagahInRashi={remaInRashi}
@@ -94,6 +94,12 @@ export function MishnaBeruraReader({
 
   return (
     <Stack gap="lg">
+      {bundle.seifim.length === 0 ? (
+        <Text variant="detail" color={SemanticColor.TextSecondary}>
+          The Mishna Berura's text for this siman isn't available. The Orach Chaim seifim are shown;
+          tap one for its Biur Halacha.
+        </Text>
+      ) : null}
       {bases.map((base) => (
         <MbSeifBlock
           key={base.n}

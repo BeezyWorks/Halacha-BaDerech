@@ -114,6 +114,34 @@ describe('buildMbBundle', () => {
   })
 })
 
+describe('buildMbBundle with Wikisource text and Biur Halacha only', () => {
+  const mbMarker = (label: string) =>
+    `<i data-commentator=Mishnah Berurah" data-label="${label}"></i>`
+  it('anchors the "(א) DH – body" format (en dash)', () => {
+    const { bundle, stats } = buildMbBundle({
+      siman: 1,
+      baseHtml: [`<b>כותרת:</b><br>יתגבר ${mbMarker('א')}כארי לעמוד בבוקר`],
+      mbText: ['(א) כארי – כי לכך נברא האדם, כמו שאמר הכתוב: "כל הנקרא בשמי"'],
+      bhText: null,
+    })
+    expect(bundle.seifim[0]).toMatchObject({ n: 1, saSeif: 1, dh: 'כארי' })
+    expect(bundle.seifim[0].text).toMatch(/^כארי – כי/)
+    expect(stats.anchorsWithEnd).toBe(1)
+  })
+  it('makes a bundle of only the base and Biur Halacha when the MB text is missing', () => {
+    const { bundle } = buildMbBundle({
+      siman: 3,
+      baseHtml: ['יברך על ידיו'],
+      mbText: [],
+      bhText: [['<b>יברך</b> - ביאור']],
+    })
+    expect(bundle.seifim).toEqual([])
+    expect(bundle.base).toHaveLength(1)
+    expect(bundle.commentary.biurHalacha).toHaveLength(1)
+    expect(bundle.base![0].anchors).toHaveLength(1)
+  })
+})
+
 describe('buildKitzurBundle', () => {
   it('keeps nikud, no commentary', () => {
     const b = buildKitzurBundle(1, ["\nשִׁוִּיתִי ה' לְנֶגְדִּי", ''], 'דיני השכמה')

@@ -5,11 +5,18 @@ import React, { useEffect, useState } from 'react'
 import { Linking } from 'react-native'
 
 import { PageLayout } from '@/components/PageLayout'
+import { gematria } from '@/features/halacha/content/parse'
 import { catalog, worksById } from '@/features/halacha/data/catalog'
 import type { Sources } from '@/features/halacha/data/catalog'
 
 const SUPPORT_EMAIL = 'mattaniah@beezyworks.com'
 const BASE = process.env.EXPO_PUBLIC_CONTENT_BASE_URL ?? ''
+
+/** "simanim א–ב, ח, כה" for a version that supplies only some simanim of a sefer. */
+const rangesLabel = (ranges: [number, number][]) =>
+  `simanim ${ranges
+    .map(([a, b]) => (a === b ? gematria(a) : `${gematria(a)}–${gematria(b)}`))
+    .join(', ')}`
 
 /** Attribution: every Sefaria version the app shows, with its license (public/content/sources.json). */
 export function AboutScreen() {
@@ -32,7 +39,10 @@ export function AboutScreen() {
   ]
   catalog.sefarim.forEach((s) => groups.find((g) => g.id === s.group)?.seferIds.push(s.id))
   const entriesFor = (seferIds: string[]) => {
-    const seen = new Map<string, { name: string; versionTitle: string; license: string }>()
+    const seen = new Map<
+      string,
+      { name: string; versionTitle: string; license: string; ranges?: string; note?: string }
+    >()
     seferIds.forEach((seferId) => {
       const sefer = catalog.sefarim.find((s) => s.id === seferId)
       Object.entries(sources?.[seferId] ?? {}).forEach(([workId, w]) => {
@@ -42,6 +52,8 @@ export function AboutScreen() {
             name,
             versionTitle: v.versionTitle,
             license: v.license,
+            ...(v.ranges ? { ranges: rangesLabel(v.ranges) } : {}),
+            ...(v.note ? { note: v.note } : {}),
           }),
         )
       })
@@ -84,8 +96,13 @@ export function AboutScreen() {
               <Stack key={`${e.name}|${e.versionTitle}`} gap="xs">
                 <Text variant="body">{e.name}</Text>
                 <Text variant="detail" color={SemanticColor.TextSecondary}>
-                  {`${e.versionTitle} · ${e.license}`}
+                  {`${e.versionTitle} · ${e.license}${e.ranges ? ` · ${e.ranges}` : ''}`}
                 </Text>
+                {e.note ? (
+                  <Text variant="detail" color={SemanticColor.TextSecondary}>
+                    {e.note}
+                  </Text>
+                ) : null}
               </Stack>
             ))}
           </SettingsCard>

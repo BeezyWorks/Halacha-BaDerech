@@ -11,9 +11,10 @@ describe('isCovered', () => {
   it('respects coverage gaps', () => {
     expect(isCovered('yd', 168)).toBe(true)
     expect(isCovered('yd', 169)).toBe(false)
-    expect(isCovered('mb', 186)).toBe(false)
-    expect(isCovered('mb', 187)).toBe(true)
-    expect(isCovered('mb', 588)).toBe(false)
+    expect(isCovered('mb', 5)).toBe(false)
+    expect(isCovered('mb', 186)).toBe(true)
+    expect(isCovered('mb', 182)).toBe(false)
+    expect(isCovered('mb', 588)).toBe(true)
   })
 })
 
@@ -27,19 +28,24 @@ describe('adjacentSiman', () => {
   it('skips missing simanim', () => {
     expect(adjacentSiman('yd', 168, 1)).toBe(170)
     expect(adjacentSiman('yd', 170, -1)).toBe(168)
-    expect(adjacentSiman('mb', 587, 1)).toBe(589)
+    expect(adjacentSiman('mb', 182, 1)).toBe(183)
+    expect(adjacentSiman('mb', 180, 1)).toBe(181)
+    expect(adjacentSiman('mb', 4, 1)).toBe(7)
   })
   it('works from an uncovered siman', () => {
-    expect(adjacentSiman('mb', 100, 1)).toBe(187)
-    expect(adjacentSiman('mb', 100, -1)).toBeUndefined()
+    expect(adjacentSiman('mb', 100, 1)).toBe(101)
+    expect(adjacentSiman('mb', 5, -1)).toBe(4)
+    expect(adjacentSiman('mb', 1, -1)).toBeUndefined()
   })
 })
 
 describe('coverageNote', () => {
   it('lists the covered ranges of a sefer with gaps', () => {
-    expect(coverageNote('mb')).toBe(
-      'Text available for simanim קפז–תקפז and תקפט–תרצז; the others are shown dimmed.',
+    expect(coverageNote('yd')).toBe(
+      'Text available for simanim א–קסח and קע–תג; the others are shown dimmed.',
     )
+    expect(coverageNote('mb')).toMatch(/^Text available for \d+ of 697 simanim; the others/)
+    expect(coverageNote('mb')).toMatch(/Biur Halacha\.$/)
   })
   it('is empty for a complete sefer', () => expect(coverageNote('kitzur')).toBeUndefined())
 })

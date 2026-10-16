@@ -22,8 +22,16 @@ export function adjacentSiman(sefer: string, siman: number, direction: 1 | -1): 
 export function coverageNote(sefer: string): string | undefined {
   const info = seferById(sefer)
   if (!info?.coverage) return undefined
-  const ranges = info.coverage
-    .map(([from, to]) => (from === to ? gematria(from) : `${gematria(from)}–${gematria(to)}`))
-    .join(' and ')
-  return `Text available for simanim ${ranges}; the others are shown dimmed.`
+  // Many scattered gaps: list the count, not the ranges.
+  const have = info.coverage.reduce((n, [from, to]) => n + to - from + 1, 0)
+  const where =
+    info.coverage.length > 4
+      ? `${have} of ${info.simanim} simanim`
+      : `simanim ${info.coverage
+          .map(([from, to]) => (from === to ? gematria(from) : `${gematria(from)}–${gematria(to)}`))
+          .join(' and ')}`
+  const bhOnly = info.versions
+    ? ' Where the Mishna Berura itself is missing, the Orach Chaim seifim are shown with the Biur Halacha.'
+    : ''
+  return `Text available for ${where}; the others are shown dimmed.${bhOnly}`
 }

@@ -17,6 +17,18 @@
  * Only Public Domain / CC0 / CC-BY(-SA/-NC) versions are accepted; anything
  * else fails the run (see versionMeta).
  *
+ * Per-siman version override: a sefer may list `versions` in the catalog, each
+ * `{ version, ranges?, licenseOverride?, note? }`. A siman is read from the
+ * first listed version whose ranges contain it (a version without ranges
+ * covers everything, so it works as a fallback); if that version is empty
+ * there, the next candidate is tried. `licenseOverride` (+ `note`) lets one
+ * specific version pass the license check when Sefaria's metadata is wrong or
+ * "unknown" but the true license is known — the global list is never loosened.
+ * Mishna Berura uses it: "On Your Way" for 187-697, Wikisource's "Wikitext"
+ * for the few simanim of 1-186 it has (1-2, 8, 25, 58, 89).
+ * Biur Halacha is fetched for every siman, so a siman with only Biur Halacha
+ * gets a bundle with the Orach Chaim seifim and no Mishna Berura text.
+ *
  * Usage:
  *   node scripts/ingest-sefaria.mjs                         # everything (resumable)
  *   node scripts/ingest-sefaria.mjs --sefer oc,mb           # just these sefarim
@@ -176,23 +188,41 @@ async function fetchLinkSeif(sefer, siman, works) {
 
 // --- sources ----------------------------------------------------------------
 const versionCache = new Map()
-async function versionMeta(title, versionTitle) {
+async function versionMeta(title, versionTitle, extra = {}) {
   if (!versionCache.has(title)) {
     versionCache.set(title, getJson(`${SEFARIA}texts/versions/${encRef(title)}`))
   }
   const all = await versionCache.get(title)
   const v = all.find((x) => x.versionTitle === versionTitle && x.language === 'he')
   if (!v) throw new Error(`Sefaria has no Hebrew version "${versionTitle}" of ${title}`)
-  if (!ACCEPTED_LICENSES.test(v.license ?? ''))
+  const license = extra.licenseOverride ?? v.license ?? ''
+  if (!ACCEPTED_LICENSES.test(license))
     throw new Error(`"${versionTitle}" of ${title} has license "${v.license}" — not allowed`)
-  return { versionTitle, license: v.license, versionSource: v.versionSource }
+  return {
+    versionTitle,
+    license,
+    versionSource: v.versionSource,
+    ...(extra.ranges ? { ranges: extra.ranges } : {}),
+    ...(extra.note ? { note: extra.note } : {}),
+  }
 }
+
+/** The sefer's base-text versions: catalog `versions`, or just `baseVersion`. */
+const seferVersions = (sefer) => sefer.versions ?? [{ version: sefer.baseVersion }]
+const inRanges = (ranges, n) => !ranges || ranges.some(([a, b]) => n >= a && n <= b)
+/** Version titles to try for this siman: those whose ranges contain it, in catalog order (ranged entries are exact; a rangeless one is a fallback). */
+const versionsForSiman = (sefer, siman) =>
+  seferVersions(sefer)
+    .filter((v) => inRanges(v.ranges, siman))
+    .map((v) => v.version)
 
 async function buildSources(sefer) {
   const entry = {
     text: {
       title: sefer.sefaria,
-      versions: [await versionMeta(sefer.sefaria, sefer.baseVersion)],
+      versions: await Promise.all(
+        seferVersions(sefer).map((v) => versionMeta(sefer.sefaria, v.version, v)),
+      ),
     },
   }
   for (const id of sefer.noseiKeilim) {
@@ -230,7 +260,7 @@ async function pool(items, limit, worker) {
 
 // --- per-siman ----------------------------------------------------------------
 async function buildSa(sefer, siman) {
-  const baseHtml = await fetchText(sefer.sefaria, siman, [sefer.baseVersion])
+  const baseHtml = await fetchText(sefer.sefaria, siman, versionsForSiman(sefer, siman))
   if (!baseHtml) throw new Error('no base text')
   const present = []
   for (const id of sefer.noseiKeilim) {
@@ -267,8 +297,8 @@ async function buildSa(sefer, siman) {
 async function buildMb(sefer, siman) {
   const oc = catalog.sefarim.find((s) => s.id === 'oc')
   const [baseHtml, mbText, bhText] = await Promise.all([
-    fetchText(oc.sefaria, siman, [oc.baseVersion]),
-    fetchText(sefer.sefaria, siman, [sefer.baseVersion]),
+    fetchText(oc.sefaria, siman, versionsForSiman(oc, siman)),
+    fetchText(sefer.sefaria, siman, versionsForSiman(sefer, siman)),
     (async () => {
       const part = workById.biurHalacha.parts.mb
       return (await hasContent(part.title, siman))
@@ -276,8 +306,10 @@ async function buildMb(sefer, siman) {
         : null
     })(),
   ])
-  if (!baseHtml || !mbText) throw new Error('missing OC or MB text')
-  return buildMbBundle({ siman, baseHtml, mbText, bhText })
+  if (!baseHtml) throw new Error('missing OC text')
+  // Neither MB nor Biur Halacha: nothing to show. Biur Halacha alone is kept (MB text empty).
+  if (!mbText && !bhText) return null
+  return buildMbBundle({ siman, baseHtml, mbText: mbText ?? [], bhText })
 }
 
 let kitzurTitles
@@ -302,11 +334,12 @@ async function ingestSiman(sefer, siman) {
   let bundle
   let stats
   if (sefer.group === 'kitzur') {
-    const html = await fetchText(sefer.sefaria, siman, [sefer.baseVersion])
+    const html = await fetchText(sefer.sefaria, siman, versionsForSiman(sefer, siman))
     if (!html) throw new Error('no text')
     bundle = buildKitzurBundle(siman, html, await kitzurTitle(sefer, siman))
   } else {
     const result = sefer.id === 'mb' ? await buildMb(sefer, siman) : await buildSa(sefer, siman)
+    if (!result) return 'missing'
     bundle = result.bundle
     stats = { ...result.stats, otherSmall: result.otherSmall.slice(0, 3) }
     if (verbose) logMatches(bundle)
@@ -410,7 +443,11 @@ const sources = existsSync(sourcesPath) ? JSON.parse(readFileSync(sourcesPath, '
 for (const sefer of selected) {
   sources[sefer.id] = await buildSources(sefer)
   const names = sefer.noseiKeilim.join(', ') || '(none)'
-  console.log(`${sefer.id}: ${sefer.sefaria} [${sefer.baseVersion}]; nosei keilim: ${names}`)
+  console.log(
+    `${sefer.id}: ${sefer.sefaria} [${seferVersions(sefer)
+      .map((v) => v.version)
+      .join(' + ')}]; nosei keilim: ${names}`,
+  )
 }
 writeJson(sourcesPath, sources)
 if (sourcesOnly) {
@@ -423,9 +460,12 @@ for (const sefer of selected) {
   const list = simanList(sefer)
   let written = 0
   let skipped = 0
+  const missing = []
   await pool(list, SIMAN_PARALLELISM, async (siman) => {
     try {
-      if ((await ingestSiman(sefer, siman)) === 'written') written++
+      const r = await ingestSiman(sefer, siman)
+      if (r === 'written') written++
+      else if (r === 'missing') missing.push(siman)
       else skipped++
       if ((written + skipped) % 50 === 0)
         console.log(`  ${sefer.id}: ${written + skipped}/${list.length}`)
@@ -436,6 +476,10 @@ for (const sefer of selected) {
   })
   writeIndex(sefer)
   console.log(`${sefer.id}: ${written} written, ${skipped} skipped (${list.length} simanim)`)
+  if (missing.length)
+    console.log(
+      `  no text on Sefaria for ${missing.length} simanim: ${missing.sort((a, b) => a - b).join(' ')}`,
+    )
 }
 if (failures.length) {
   console.error(`\n${failures.length} failures (re-run to retry):\n  ${failures.join('\n  ')}`)

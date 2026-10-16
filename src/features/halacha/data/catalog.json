@@ -90,11 +90,59 @@
       "group": "mishnaBerura",
       "sefaria": "Mishnah Berurah",
       "baseVersion": "On Your Way",
+      "versions": [
+        {
+          "version": "On Your Way",
+          "ranges": [
+            [187, 587],
+            [589, 697]
+          ]
+        },
+        {
+          "version": "Wikitext",
+          "ranges": [
+            [1, 2],
+            [8, 8],
+            [25, 25],
+            [58, 58],
+            [89, 89]
+          ],
+          "licenseOverride": "CC-BY-SA",
+          "note": "Hebrew Wikisource (he.wikisource.org), which has only these simanim of 1-186; Sefaria lists its license as unknown, but it is Wikisource text, which is CC-BY-SA."
+        }
+      ],
       "simanim": 697,
       "noseiKeilim": ["biurHalacha"],
       "coverage": [
-        [187, 587],
-        [589, 697]
+        [1, 4],
+        [7, 16],
+        [20, 22],
+        [25, 27],
+        [30, 34],
+        [36, 47],
+        [49, 49],
+        [51, 55],
+        [57, 67],
+        [69, 85],
+        [87, 92],
+        [94, 95],
+        [98, 98],
+        [101, 104],
+        [106, 111],
+        [113, 114],
+        [117, 117],
+        [119, 119],
+        [121, 128],
+        [130, 132],
+        [135, 137],
+        [139, 144],
+        [146, 147],
+        [150, 156],
+        [158, 165],
+        [167, 174],
+        [176, 179],
+        [181, 181],
+        [183, 697]
       ]
     },
     {
@@ -482,7 +530,7 @@
   ],
   "notes": {
     "shaarHaTziyun": "Not on Sefaria; skipped.",
-    "mishnaBeruraCoverage": "Only On Your Way (Public Domain) is used; it covers simanim 187-587 and 589-697.",
+    "mishnaBeruraVersions": "On Your Way (Public Domain) covers simanim 187-587 and 589-697; Wikitext (Hebrew Wikisource, CC-BY-SA via licenseOverride) supplies only simanim 1-2, 8, 25, 58 and 89 of the missing ones.",
     "yd169": "Yoreh Deah 169 has no text on Sefaria (shape length 0); skipped."
   }
 }
