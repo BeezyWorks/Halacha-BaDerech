@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/BeezyWorks/Halacha-BaDerech/compare/v1.0.0...v1.1.0) (2026-10-16)
+
+
+### Features
+
+* **ingest:** read mishna berura simanim 1-186 and 588 from hebrew wikisource ([0476ec9](https://github.com/BeezyWorks/Halacha-BaDerech/commit/0476ec9b19ee7cb7690b6cef9e3673379a74b0ab))
+
 # 1.0.0 (2026-10-16)
 
 
