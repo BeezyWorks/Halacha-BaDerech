@@ -66,7 +66,7 @@ same conventions.
   of 697). A siman with only Biur Halacha has empty `seifim` and renders the
   Orach Chaim seifim (tap one for its Biur Halacha) under a notice; the other
   38 are dimmed in the list. MB anchors for the Wikitext simanim: 211 of 211
-  markers mapped, 203 with `end` (DH located); the format is the same
+  markers mapped, 207 with `end` (DH located); the format is the same
   `(א) DH – body` that `splitMb` handles. Sha'ar HaTziyun is not on Sefaria.
 - Navigation is **sefer → siman → seif**. Tapping a seif opens its nosei
   keilim in the root `SheetRoot` (DL `BottomSheetModal`: bottom sheet on
