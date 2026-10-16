@@ -98,10 +98,10 @@ describe('searchSimanim', () => {
     expect(keys('ד')).toEqual(['oc4', 'yd4', 'eh4', 'cm4'])
   })
   it('marks uncovered simanim', () => {
-    const mb = { mb: simanEntries('mb', 697, undefined) }
-    const r = searchSimanim('100', [{ id: 'mb' }], mb)
-    expect(r.simanim[0]).toMatchObject({ sefer: 'mb', n: 100, covered: false })
-    expect(searchSimanim('328', [{ id: 'mb' }], mb).simanim[0].covered).toBe(true)
+    const yd = { yd: simanEntries('yd', 703, undefined) }
+    const r = searchSimanim('169', [{ id: 'yd' }], yd)
+    expect(r.simanim[0]).toMatchObject({ sefer: 'yd', n: 169, covered: false })
+    expect(searchSimanim('328', [{ id: 'yd' }], yd).simanim[0].covered).toBe(true)
   })
   it('returns nothing for an empty query', () => {
     expect(search('').simanim).toEqual([])

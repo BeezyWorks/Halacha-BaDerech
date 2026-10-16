@@ -56,6 +56,12 @@ export interface Stats {
   /** Anchors that came from a DH search rather than a marker. */
   anchorsSearched: number
   /** Marker anchors whose comment has no DH to match. */
+  /** Wikisource only: seifim katanim without an OC marker / OC markers without a seif katan. */
+  mbSkNoMarker?: number
+  mbMarkerNoSk?: number
+  /** Wikisource only: seifim katanim whose Wikisource seif differs from the OC marker's. */
+  mbSeifDisagree?: number
+  alignment?: { skNoMarker: string[]; markerNoText: string[] }
   perWork: Record<
     string,
     { markers: number; anchors: number; withEnd: number; withDh: number; searched: number }
@@ -348,7 +354,13 @@ export interface BuildMbInput {
   /** Orach Chaim seifim of this siman (Sefaria HTML). */
   baseHtml: string[]
   /** Mishna Berura seifim katanim (Sefaria text, `(א) DH - body`). */
-  mbText: string[]
+  mbText?: string[]
+  /**
+   * Alternatively, seifim katanim already parsed with their Shulchan Aruch seif
+   * (Hebrew Wikisource, see wikisource.ts); `n: 0` is unnumbered text before a
+   * seif's first seif katan. Overrides `mbText`.
+   */
+  mbUnits?: Unit[]
   /** Biur Halacha: `[seif][comment]`, or null. */
   bhText: unknown
 }
@@ -358,10 +370,31 @@ export function buildMbBundle(input: BuildMbInput): BuildResult {
   const stats = newStats()
   const base = parseBase(input.baseHtml)
   const units = base.units
-  const mb = input.mbText.map((h) => (typeof h === 'string' ? splitMb(h) : { text: '' }))
+  interface MbEntry {
+    sk: number
+    label?: string
+    dh?: string
+    text: string
+    /** The seif the source itself places this seif katan in (wikisource only). */
+    sourceSeif?: number
+  }
+  const entries: MbEntry[] = input.mbUnits
+    ? input.mbUnits.map((u) => ({
+        sk: u.n,
+        ...(u.n ? { label: gematria(u.n) } : {}),
+        ...(u.dh ? { dh: u.dh } : {}),
+        text: u.text,
+        ...(u.saSeif ? { sourceSeif: u.saSeif } : {}),
+      }))
+    : (input.mbText ?? []).map((h, i) => ({
+        sk: i + 1,
+        ...splitMb(typeof h === 'string' ? h : ''),
+      }))
+  const mbBySk = new Map(entries.filter((e) => e.sk > 0).map((e) => [e.sk, e]))
 
   // MB marker → sk: by its printed letter, validated against the MB text's own "(א)".
   const first = new Map<number, FirstMarker>()
+  const orphanMarkers: string[] = []
   let seq = 0
   for (const m of base.markers) {
     if (m.commentator !== 'Mishnah Berurah') continue
@@ -369,8 +402,9 @@ export function buildMbBundle(input: BuildMbInput): BuildResult {
     stats.markers++
     perWork(stats, 'mb').markers++
     let sk = m.label ? parseGematria(m.label) : NaN
-    if (!Number.isFinite(sk) || (m.label && mb[sk - 1]?.label !== m.label)) sk = seq
-    if (first.has(sk) || !mb[sk - 1]) {
+    if (!Number.isFinite(sk) || (m.label && mbBySk.get(sk)?.label !== m.label)) sk = seq
+    if (first.has(sk) || !mbBySk.has(sk)) {
+      if (!first.has(sk)) orphanMarkers.push(m.label ?? String(sk))
       stats.markersOrphan++
       continue
     }
@@ -380,18 +414,22 @@ export function buildMbBundle(input: BuildMbInput): BuildResult {
   const seifim: Unit[] = []
   const anchorsBySeif = new Map<number, Anchor[]>()
   let lastSeif = 1
-  mb.forEach((c, i) => {
-    const sk = i + 1
-    if (!c.text) return
-    const marker = first.get(sk)
-    let saSeif = marker?.seif
+  for (const c of entries) {
+    const sk = c.sk
+    if (!c.text) continue
+    const marker = sk > 0 ? first.get(sk) : undefined
+    // The OC text's own marker places the seif katan against this base text; the source's
+    // header is the fallback.
+    let saSeif = marker?.seif ?? c.sourceSeif
+    if (marker && c.sourceSeif !== undefined && marker.seif !== c.sourceSeif)
+      stats.mbSeifDisagree = (stats.mbSeifDisagree ?? 0) + 1
     if (saSeif === undefined) {
       saSeif = lastSeif
       stats.commentsSeifInferred++
     }
     saSeif = Math.max(1, Math.min(saSeif, units.length || 1))
     lastSeif = saSeif
-    stats.comments++
+    if (sk > 0) stats.comments++
     seifim.push({ n: sk, text: c.text, saSeif, ...(c.dh ? { dh: c.dh } : {}) })
     if (marker) {
       const unit = units[marker.seif - 1]
@@ -413,7 +451,20 @@ export function buildMbBundle(input: BuildMbInput): BuildResult {
       list.push({ at: marker.at, ...(m ? { end: m.end } : {}), work: 'mb', sk })
       anchorsBySeif.set(marker.seif, list)
     }
-  })
+  }
+  // Source pages are sometimes out of order (e.g. an sk filed under a later header).
+  seifim.sort((a, b) => a.n - b.n)
+  if (input.mbUnits) {
+    // Alignment of the source's seifim katanim with the OC text's MB markers.
+    const have = new Set(entries.filter((e) => e.sk > 0).map((e) => e.sk))
+    const noMarker = [...have].filter((sk) => !first.has(sk))
+    stats.mbSkNoMarker = noMarker.length
+    stats.mbMarkerNoSk = orphanMarkers.length
+    stats.alignment = {
+      skNoMarker: noMarker.map(gematria),
+      markerNoText: orphanMarkers,
+    }
+  }
 
   // Biur Halacha: [seif][comment]; anchor by searching its DH in the seif.
   const bh: Comment[] = []

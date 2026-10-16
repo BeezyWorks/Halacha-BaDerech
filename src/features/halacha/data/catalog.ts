@@ -27,9 +27,18 @@ export interface CatalogWork {
   parts: Record<string, CatalogPart>
 }
 
-/** One Sefaria version of a sefer's base text, optionally for only some simanim. */
+/** One version of a sefer's base text (Sefaria's, or Hebrew Wikisource's), optionally for only some simanim. */
 export interface CatalogVersion {
+  /** Where it comes from; absent = Sefaria. */
+  source?: 'wikisource'
+  /** The Sefaria version title (for Wikisource: the name shown, "Hebrew Wikisource"). */
   version: string
+  /** Wikisource: the page title, with `{siman}` for the Hebrew numeral. */
+  page?: string
+  /** Wikisource: the license (Sefaria's metadata does not apply). */
+  license?: string
+  /** Wikisource: the link shown in the About screen. */
+  url?: string
   /** Inclusive [first, last] simanim this version supplies; absent = all (a fallback). */
   ranges?: [number, number][]
   /** The license to record when Sefaria's metadata for this version is wrong/"unknown". */

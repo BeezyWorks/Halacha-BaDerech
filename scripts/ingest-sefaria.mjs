@@ -24,8 +24,12 @@
  * there, the next candidate is tried. `licenseOverride` (+ `note`) lets one
  * specific version pass the license check when Sefaria's metadata is wrong or
  * "unknown" but the true license is known — the global list is never loosened.
- * Mishna Berura uses it: "On Your Way" for 187-697, Wikisource's "Wikitext"
- * for the few simanim of 1-186 it has (1-2, 8, 25, 58, 89).
+ * Mishna Berura uses it: "On Your Way" for 187-587 and 589-697.
+ * A version may instead be `{ source: 'wikisource', page: 'משנה ברורה על אורח חיים {siman}',
+ * ranges, license, note }`: the text is then read straight from Hebrew Wikisource
+ * (he.wikisource.org, fetched politely and cached in scripts/.cache/wikisource/) and parsed
+ * by features/halacha/content/wikisource.ts. Mishna Berura uses it for simanim 1-186 and
+ * 588, where Sefaria has no usable text.
  * Biur Halacha is fetched for every siman, so a siman with only Biur Halacha
  * gets a bundle with the Orach Chaim seifim and no Mishna Berura text.
  *
@@ -56,6 +60,11 @@ import {
   buildSaBundle,
 } from '../src/features/halacha/content/bundle.ts'
 import { flattenSegments } from '../src/features/halacha/content/parse.ts'
+import {
+  parseWikisourceMb,
+  wikisourcePageTitle,
+} from '../src/features/halacha/content/wikisource.ts'
+import { fetchWikitext } from './lib/wikisource.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const OUT = join(ROOT, 'public/content')
@@ -211,17 +220,35 @@ async function versionMeta(title, versionTitle, extra = {}) {
 const seferVersions = (sefer) => sefer.versions ?? [{ version: sefer.baseVersion }]
 const inRanges = (ranges, n) => !ranges || ranges.some(([a, b]) => n >= a && n <= b)
 /** Version titles to try for this siman: those whose ranges contain it, in catalog order (ranged entries are exact; a rangeless one is a fallback). */
+const versionEntriesForSiman = (sefer, siman) =>
+  seferVersions(sefer).filter((v) => inRanges(v.ranges, siman))
+/** Sefaria version titles for this siman (Wikisource entries are read separately). */
 const versionsForSiman = (sefer, siman) =>
-  seferVersions(sefer)
-    .filter((v) => inRanges(v.ranges, siman))
+  versionEntriesForSiman(sefer, siman)
+    .filter((v) => v.source !== 'wikisource')
     .map((v) => v.version)
+
+/** sources.json entry for a Hebrew Wikisource version. */
+function wikisourceMeta(v) {
+  if (!ACCEPTED_LICENSES.test(v.license ?? ''))
+    throw new Error(`Wikisource version needs a license`)
+  return {
+    versionTitle: 'Hebrew Wikisource',
+    license: v.license,
+    versionSource: v.url ?? 'https://he.wikisource.org/wiki/',
+    ...(v.ranges ? { ranges: v.ranges } : {}),
+    ...(v.note ? { note: v.note } : {}),
+  }
+}
 
 async function buildSources(sefer) {
   const entry = {
     text: {
       title: sefer.sefaria,
       versions: await Promise.all(
-        seferVersions(sefer).map((v) => versionMeta(sefer.sefaria, v.version, v)),
+        seferVersions(sefer).map((v) =>
+          v.source === 'wikisource' ? wikisourceMeta(v) : versionMeta(sefer.sefaria, v.version, v),
+        ),
       ),
     },
   }
@@ -296,9 +323,19 @@ async function buildSa(sefer, siman) {
 
 async function buildMb(sefer, siman) {
   const oc = catalog.sefarim.find((s) => s.id === 'oc')
+  const wikiEntry = versionEntriesForSiman(sefer, siman).find((v) => v.source === 'wikisource')
+  let wiki = null
+  if (wikiEntry) {
+    const title = wikisourcePageTitle(wikiEntry.page, siman)
+    const wikitext = (await fetchWikitext([title])).get(title)
+    if (wikitext) {
+      wiki = parseWikisourceMb(wikitext)
+      for (const w of wiki.warnings) console.warn(`  wikisource ${siman}: ${w}`)
+    } else console.warn(`  wikisource ${siman}: page "${title}" not found`)
+  }
   const [baseHtml, mbText, bhText] = await Promise.all([
     fetchText(oc.sefaria, siman, versionsForSiman(oc, siman)),
-    fetchText(sefer.sefaria, siman, versionsForSiman(sefer, siman)),
+    wiki?.units.length ? null : fetchText(sefer.sefaria, siman, versionsForSiman(sefer, siman)),
     (async () => {
       const part = workById.biurHalacha.parts.mb
       return (await hasContent(part.title, siman))
@@ -308,8 +345,13 @@ async function buildMb(sefer, siman) {
   ])
   if (!baseHtml) throw new Error('missing OC text')
   // Neither MB nor Biur Halacha: nothing to show. Biur Halacha alone is kept (MB text empty).
-  if (!mbText && !bhText) return null
-  return buildMbBundle({ siman, baseHtml, mbText: mbText ?? [], bhText })
+  if (!wiki?.units.length && !mbText && !bhText) return null
+  return buildMbBundle({
+    siman,
+    baseHtml,
+    ...(wiki?.units.length ? { mbUnits: wiki.units } : { mbText: mbText ?? [] }),
+    bhText,
+  })
 }
 
 let kitzurTitles
@@ -409,6 +451,10 @@ function reportStats() {
     `  mapped to a comment:      ${total.markersMapped} (${pct(total.markersMapped, relevant)})`,
   )
   console.log(`  orphan (no comment/dupe): ${total.markersOrphan}`)
+  if (total.mbSkNoMarker !== undefined || total.mbMarkerNoSk !== undefined)
+    console.log(
+      `wikisource MB alignment: sk without an OC marker ${total.mbSkNoMarker ?? 0}; OC markers without a sk ${total.mbMarkerNoSk ?? 0}; sk placed in a different seif than the OC marker ${total.mbSeifDisagree ?? 0}`,
+    )
   console.log(`anchors: ${total.anchors} (found by DH search, no marker: ${total.anchorsSearched})`)
   console.log(
     `  with a DH to match:       ${total.anchorsWithDh} (${pct(total.anchorsWithDh, total.anchors)})`,

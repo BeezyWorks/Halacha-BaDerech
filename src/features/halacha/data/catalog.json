@@ -99,51 +99,20 @@
           ]
         },
         {
-          "version": "Wikitext",
+          "source": "wikisource",
+          "version": "Hebrew Wikisource",
+          "page": "משנה ברורה על אורח חיים {siman}",
           "ranges": [
-            [1, 2],
-            [8, 8],
-            [25, 25],
-            [58, 58],
-            [89, 89]
+            [1, 186],
+            [588, 588]
           ],
-          "licenseOverride": "CC-BY-SA",
-          "note": "Hebrew Wikisource (he.wikisource.org), which has only a few of simanim 1-186. Sefaria lists no license for it, but Wikisource text is CC-BY-SA."
+          "license": "CC-BY-SA",
+          "url": "https://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%A0%D7%94_%D7%91%D7%A8%D7%95%D7%A8%D7%94_%D7%A2%D7%9C_%D7%90%D7%95%D7%A8%D7%97_%D7%97%D7%99%D7%99%D7%9D",
+          "note": "Hebrew Wikisource (he.wikisource.org), CC-BY-SA, for simanim 1-186 and 588, where Sefaria has no usable text."
         }
       ],
       "simanim": 697,
-      "noseiKeilim": ["biurHalacha"],
-      "coverage": [
-        [1, 4],
-        [7, 16],
-        [20, 22],
-        [25, 27],
-        [30, 34],
-        [36, 47],
-        [49, 49],
-        [51, 55],
-        [57, 67],
-        [69, 85],
-        [87, 92],
-        [94, 95],
-        [98, 98],
-        [101, 104],
-        [106, 111],
-        [113, 114],
-        [117, 117],
-        [119, 119],
-        [121, 128],
-        [130, 132],
-        [135, 137],
-        [139, 144],
-        [146, 147],
-        [150, 156],
-        [158, 165],
-        [167, 174],
-        [176, 179],
-        [181, 181],
-        [183, 697]
-      ]
+      "noseiKeilim": ["biurHalacha"]
     },
     {
       "id": "kitzur",
@@ -530,7 +499,7 @@
   ],
   "notes": {
     "shaarHaTziyun": "Not on Sefaria; skipped.",
-    "mishnaBeruraVersions": "On Your Way (Public Domain) covers simanim 187-587 and 589-697; Wikitext (Hebrew Wikisource, CC-BY-SA via licenseOverride) supplies only simanim 1-2, 8, 25, 58 and 89 of the missing ones.",
+    "mishnaBeruraVersions": "On Your Way (Public Domain) covers simanim 187-587 and 589-697; Hebrew Wikisource (CC-BY-SA) supplies 1-186 and 588 through a source: wikisource version.",
     "yd169": "Yoreh Deah 169 has no text on Sefaria (shape length 0); skipped."
   }
 }

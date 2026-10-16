@@ -9,7 +9,7 @@ interface Props {
   onPress?: () => void
 }
 
-/** One seif katan of the Mishna Berura: "(א)", its dibur hamaschil in bold, then the rest. */
+/** One seif katan of the Mishna Berura: "(א)", its dibur hamaschil in bold, then the rest. An empty `label` is unnumbered text (Wikisource `n: 0`). */
 export const MishnaBeruraSeifKatan = React.memo(function MishnaBeruraSeifKatan({
   unit,
   label,
@@ -18,9 +18,11 @@ export const MishnaBeruraSeifKatan = React.memo(function MishnaBeruraSeifKatan({
   const dh = unit.dh && unit.text.startsWith(unit.dh) ? unit.dh : ''
   return (
     <Text content selectable={false} onPress={onPress}>
-      <Text content bold color={SemanticColor.TextMarker}>
-        {`(${label}) `}
-      </Text>
+      {label ? (
+        <Text content bold color={SemanticColor.TextMarker}>
+          {`(${label}) `}
+        </Text>
+      ) : null}
       {dh ? (
         <Text content bold>
           {dh}

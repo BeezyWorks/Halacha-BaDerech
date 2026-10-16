@@ -41,7 +41,14 @@ export function AboutScreen() {
   const entriesFor = (seferIds: string[]) => {
     const seen = new Map<
       string,
-      { name: string; versionTitle: string; license: string; ranges?: string; note?: string }
+      {
+        name: string
+        versionTitle: string
+        license: string
+        ranges?: string
+        note?: string
+        url?: string
+      }
     >()
     seferIds.forEach((seferId) => {
       const sefer = catalog.sefarim.find((s) => s.id === seferId)
@@ -54,6 +61,9 @@ export function AboutScreen() {
             license: v.license,
             ...(v.ranges ? { ranges: rangesLabel(v.ranges) } : {}),
             ...(v.note ? { note: v.note } : {}),
+            ...(v.versionSource?.startsWith('https://he.wikisource.org')
+              ? { url: v.versionSource }
+              : {}),
           }),
         )
       })
@@ -70,7 +80,8 @@ export function AboutScreen() {
           and non-commercial.
         </Text>
         <Text variant="detail">
-          All texts come from Sefaria (sefaria.org). Each version's license is listed below.
+          Texts come from Sefaria (sefaria.org) and Hebrew Wikisource (he.wikisource.org). Each
+          version's license is listed below.
         </Text>
       </SettingsCard>
       <SettingsCard title="Support">
@@ -98,6 +109,11 @@ export function AboutScreen() {
                 <Text variant="detail" color={SemanticColor.TextSecondary}>
                   {`${e.versionTitle} · ${e.license}${e.ranges ? ` · ${e.ranges}` : ''}`}
                 </Text>
+                {e.url ? (
+                  <Text variant="detail" underline onPress={() => Linking.openURL(e.url!)}>
+                    {decodeURI(e.url)}
+                  </Text>
+                ) : null}
                 {e.note ? (
                   <Text variant="detail" color={SemanticColor.TextSecondary}>
                     {e.note}

@@ -55,7 +55,7 @@ const MbSeifBlock = React.memo(function MbSeifBlock({
         <Stack key={sk.n} onLayout={(e) => register(`sk:${sk.n}`, e.nativeEvent.layout.y)}>
           <MishnaBeruraSeifKatan
             unit={sk}
-            label={formatGematriya(sk.n)}
+            label={sk.n ? formatGematriya(sk.n) : ''}
             onPress={() => open({ seif: base.n, sk: sk.n })}
           />
         </Stack>
