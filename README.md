@@ -19,8 +19,34 @@ pnpm install
 pnpm web
 ```
 
+## Features
+
+- Shulchan Aruch (Orach Chaim, Yoreh Deah, Even HaEzer, Choshen Mishpat)
+  with its nosei keilim, Mishna Berura with Biur Halacha, and Kitzur.
+- Seifim show colored dibur hamaschil spans; tap a seif for a panel of the
+  nosei keilim, tap a span to jump to its comment; in the Mishna Berura, tap
+  a highlighted span to jump to its seif katan, and a seif katan for the
+  Biur Halacha.
+- Notes, bookmarks, recents; search by siman, chelek or heading; settings
+  for which commentaries to show; data export/import.
+
 ## Content
 
-Texts come from Sefaria's API via `scripts/ingest-sefaria.mjs` (currently a
-stub; the ingest is built in a later step). Every version and its license
-is shown in-app under Settings → About & sources.
+Texts come from Sefaria's API via `scripts/ingest-sefaria.mjs` (Node >= 23.6)
+into `public/content/<sefer>/<siman>.json`, driven by
+`src/features/halacha/data/catalog.json` (sefarim, versions, works).
+
+```
+node scripts/ingest-sefaria.mjs                      # everything, resumable
+node scripts/ingest-sefaria.mjs --sefer mb --simanim 1-186,588
+node scripts/ingest-sefaria.mjs --force | --sources-only | --stats
+```
+
+A sefer's catalog entry may list several `versions` with siman `ranges`; a
+version Sefaria mislabels can carry a `licenseOverride` and a `note` (Mishna
+Berura uses Hebrew Wikisource's text, CC-BY-SA, for a few early simanim).
+Every version and its license is shown in-app under Settings, About.
+
+The reader engine (`src/features/reader`) is generic and intended for reuse
+by Mikros BaDerech, the mishna app and a Rambam app. Known gaps and the
+design-system additions are listed in `AGENTS.md`.
