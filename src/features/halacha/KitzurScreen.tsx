@@ -1,12 +1,17 @@
 import React from 'react'
 
-import { ComingSoon } from '@/components/ComingSoon'
-import { TestLinks } from './components/TestLinks'
+import { SimanList } from './components/SimanList'
 
+const SCOPE = ['kitzur']
+
+/** `/kitzur`: the 221 simanim of the Kitzur Shulchan Aruch. */
 export function KitzurScreen() {
   return (
-    <ComingSoon title="קיצור שולחן ערוך" subtitle="The Kitzur Shulchan Aruch.">
-      <TestLinks links={[{ title: 'קיצור שולחן ערוך א', sefer: 'kitzur', siman: 1 }]} />
-    </ComingSoon>
+    <SimanList
+      scope={SCOPE}
+      title="קיצור שולחן ערוך"
+      display
+      placeholder="חיפוש · Search simanim"
+    />
   )
 }

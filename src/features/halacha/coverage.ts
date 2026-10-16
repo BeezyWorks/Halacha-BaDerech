@@ -1,4 +1,5 @@
 import { seferById } from './data/catalog'
+import { gematria } from './content/parse'
 
 /** Does the sefer have content for this siman? (Some are not on Sefaria: see the catalog's `coverage`.) */
 export function isCovered(sefer: string, siman: number): boolean {
@@ -15,4 +16,14 @@ export function adjacentSiman(sefer: string, siman: number, direction: 1 | -1): 
     if (isCovered(sefer, n)) return n
   }
   return undefined
+}
+
+/** A line about gaps in a sefer's text ("…simanim קפז–תקפז and תקפט–תרצז"), or undefined when it is complete. */
+export function coverageNote(sefer: string): string | undefined {
+  const info = seferById(sefer)
+  if (!info?.coverage) return undefined
+  const ranges = info.coverage
+    .map(([from, to]) => (from === to ? gematria(from) : `${gematria(from)}–${gematria(to)}`))
+    .join(' and ')
+  return `Text available for simanim ${ranges}; the others are shown dimmed.`
 }

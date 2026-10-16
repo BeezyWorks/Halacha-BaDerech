@@ -1,4 +1,4 @@
-import { adjacentSiman, isCovered } from '../coverage'
+import { adjacentSiman, coverageNote, isCovered } from '../coverage'
 
 describe('isCovered', () => {
   it('knows the sefer bounds', () => {
@@ -33,4 +33,13 @@ describe('adjacentSiman', () => {
     expect(adjacentSiman('mb', 100, 1)).toBe(187)
     expect(adjacentSiman('mb', 100, -1)).toBeUndefined()
   })
+})
+
+describe('coverageNote', () => {
+  it('lists the covered ranges of a sefer with gaps', () => {
+    expect(coverageNote('mb')).toBe(
+      'Text available for simanim קפז–תקפז and תקפט–תרצז; the others are shown dimmed.',
+    )
+  })
+  it('is empty for a complete sefer', () => expect(coverageNote('kitzur')).toBeUndefined())
 })

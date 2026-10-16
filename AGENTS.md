@@ -59,9 +59,15 @@ same conventions.
 - Locations are `{ sefer, siman, seif }` (`features/halacha/types.ts`;
   `sefer` is one of `oc | yd | eh | cm | mb | kitzur`). Bookmarks, notes
   and history all attach to a `SeifLocation`.
-- Tabs: **Home**, **Shulchan Aruch** (`/shulchan-aruch`), **Mishna Berura**
-  (`/mishna-berura`), **Kitzur** (`/kitzur`), **Settings**. The three
-  content tabs are "coming soon" placeholders (`components/ComingSoon`).
+- Tabs: **Home**, **Shulchan Aruch** (`/shulchan-aruch`: four chelek tiles,
+  then `/shulchan-aruch/[sefer]` lists its simanim), **Mishna Berura**
+  (`/mishna-berura`) and **Kitzur** (`/kitzur`) — the last two are the siman
+  list itself. Lists are virtualized (`components/ListPage`, a `FlatList`;
+  OC has 697 simanim), show Hebrew-numeral simanim with their headings, and
+  dim simanim without text. Search (`halacha/search/searchSimanim.ts`) takes a
+  siman number (שכח / 328), a chelek + number (oc 328, או״ח א) or a heading
+  substring. Settings: nosei keilim per chelek and for the Mishna Berura
+  (Biur Halacha), each toggle beside its color swatch.
 - Home is drawn over a synagogue ark photo (DL `PhotoBackground`; the photo
   is a placeholder), with `GlassTile`s linking to the three works, then
   glass panels for recents, bookmarks and notes; the side rail frosts over it.

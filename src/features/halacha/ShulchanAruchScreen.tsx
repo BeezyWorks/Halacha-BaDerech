@@ -1,23 +1,22 @@
+import { useRouter } from 'expo-router'
 import React from 'react'
 
-import { ComingSoon } from '@/components/ComingSoon'
-import { TestLinks } from './components/TestLinks'
+import { SimanList } from './components/SimanList'
 
+const CHELAKIM = ['oc', 'yd', 'eh', 'cm'] as const
+
+/** `/shulchan-aruch`: the four chelakim as tiles; searching lists simanim across all of them. */
 export function ShulchanAruchScreen() {
+  const router = useRouter()
   return (
-    <ComingSoon
+    <SimanList
+      scope={CHELAKIM}
       title="שולחן ערוך"
-      subtitle="Orach Chaim, Yoreh Deah, Even HaEzer and Choshen Mishpat, with nosei keilim."
-    >
-      <TestLinks
-        links={[
-          { title: 'אורח חיים א', sefer: 'oc', siman: 1 },
-          { title: 'אורח חיים שכח', sefer: 'oc', siman: 328 },
-          { title: 'יורה דעה קסח', sefer: 'yd', siman: 168 },
-          { title: 'אבן העזר א', sefer: 'eh', siman: 1 },
-          { title: 'חושן משפט כה', sefer: 'cm', siman: 25 },
-        ]}
-      />
-    </ComingSoon>
+      display
+      placeholder="חיפוש · Search simanim (שכח, oc 328)"
+      onOpenSefer={(sefer) =>
+        router.push({ pathname: '/shulchan-aruch/[sefer]', params: { sefer } })
+      }
+    />
   )
 }

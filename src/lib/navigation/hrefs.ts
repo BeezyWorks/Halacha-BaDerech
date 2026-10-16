@@ -16,10 +16,10 @@ export function simanHref(sefer: string, siman: number, seif?: number) {
 export const hrefFor = (location: LastLocation) =>
   simanHref(location.sefer, location.siman, location.seif)
 
-/** A sefer's tab root. */
+/** Where "back" from a siman goes: the sefer's list (a chelek's own list for Shulchan Aruch). */
 export const seferRootHref = (sefer: string) =>
   sefer === 'mb'
     ? ('/mishna-berura' as const)
     : sefer === 'kitzur'
       ? ('/kitzur' as const)
-      : ('/shulchan-aruch' as const)
+      : ({ pathname: '/shulchan-aruch/[sefer]', params: { sefer } } as const)

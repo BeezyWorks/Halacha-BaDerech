@@ -1,3 +1,5 @@
+import { gematria } from './content/parse'
+
 /** The works a location can point into. Shulchan Aruch's four chelakim, the
  * Mishna Berura (its own sefer) and the Kitzur Shulchan Aruch. */
 export const SEFARIM = ['oc', 'yd', 'eh', 'cm', 'mb', 'kitzur'] as const
@@ -29,6 +31,22 @@ const SEFER_NAMES: Record<SeferId, string> = {
 /** Hebrew name of a sefer, falling back to the raw id for unknown ones. */
 export const seferName = (sefer: string) => SEFER_NAMES[sefer as SeferId] ?? sefer
 
-/** "אורח חיים · סימן 1 · סעיף 2" */
+const SEFER_SHORT_NAMES: Record<SeferId, string> = {
+  oc: 'או״ח',
+  yd: 'יו״ד',
+  eh: 'אבהע״ז',
+  cm: 'חו״מ',
+  mb: 'משנה ברורה',
+  kitzur: 'קיצור שו״ע',
+}
+
+/** Short Hebrew name of a sefer (או״ח, יו״ד…), falling back to the full name. */
+export const seferShortName = (sefer: string) =>
+  SEFER_SHORT_NAMES[sefer as SeferId] ?? seferName(sefer)
+
+/** "סימן שכח" */
+export const simanLabel = (siman: number) => `סימן ${gematria(siman)}`
+
+/** "או״ח סימן שכח סעיף ב" */
 export const seifLabel = (l: SeifLocation) =>
-  `${seferName(l.sefer)} · סימן ${l.siman} · סעיף ${l.seif}`
+  `${seferShortName(l.sefer)} ${simanLabel(l.siman)} סעיף ${gematria(l.seif)}`
