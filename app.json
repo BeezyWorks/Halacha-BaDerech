@@ -29,6 +29,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "./plugins/with-scene-lifecycle",
       "expo-router",
       "expo-font",
       [
