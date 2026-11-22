@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/BeezyWorks/Halacha-BaDerech/compare/v1.1.0...v1.1.1) (2026-11-22)
+
+
+### Bug Fixes
+
+* **ios:** adopt the UIScene lifecycle so iOS 27 doesn't trap at launch ([e7afd7d](https://github.com/BeezyWorks/Halacha-BaDerech/commit/e7afd7db2bbabbba98165dfce398eb1b46a946be))
+
 # [1.1.0](https://github.com/BeezyWorks/Halacha-BaDerech/compare/v1.0.0...v1.1.0) (2026-10-16)
 
 
